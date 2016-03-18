@@ -1,2 +1,5 @@
 .geany
 bin/
+target/
+src/logoparsing/**
+!src/logoparsing/LogoTreeVisitor.java
