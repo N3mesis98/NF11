@@ -38,7 +38,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 		int max = getAttValue(ctx.exp());
 		int hvalue = ThreadLocalRandom.current().nextInt(0, max +1);
 		setAttValue(ctx, hvalue);
-		Log.appendnl("visitHasard : value=" + hvalue);
+		Log.appendnl("visitHasard (value=" + hvalue + ")");
 		return 0;
 	}
 
@@ -66,6 +66,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 	public Integer visitArule(AruleContext ctx) {
 		visit(ctx.atom());
 		setAttValue(ctx, getAttValue(ctx.atom()));
+		Log.appendnl("visitAtom");
 		return 0;
 	}
 
@@ -81,7 +82,9 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 		
 		// compute requested arithmetic operation
 		setAttValue(ctx, isMult ? lChild * rChild : lChild / rChild);
-		
+
+		Log.appendnl("visitMult");
+
 		// return value 0 : "all is well that ends well"
 		return 0;
 	}
@@ -98,7 +101,9 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 		
 		// compute requested arithmetic operation
 		setAttValue(ctx, isAdd ? lChild + rChild : lChild - rChild);
-		
+
+		Log.appendnl("visitSum");
+
 		// return value 0 : "all is well that ends well"
 		return 0;
 	}
@@ -107,6 +112,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 	public Integer visitParent(ParentContext ctx) {
 		visit(ctx.exp());
 		setAttValue(ctx, getAttValue(ctx.exp()));
+		Log.appendnl("visitParent");
 		return 0;
 	}
 
@@ -114,6 +120,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 	public Integer visitInt(IntContext ctx) {
 		String intText = ctx.INT().getText(); 
 		setAttValue(ctx, Integer.valueOf(intText));
+		Log.appendnl("visitInt");
 		return 0;
 	}
 
@@ -129,7 +136,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 	public Integer visitTd(TdContext ctx) {
 		visitChildren(ctx);
 		traceur.td(getAttValue(ctx.exp()));
-		Log.append("visitTd\n" );
+		Log.appendnl("visitTd");
 		return 0;
 	}
 
@@ -137,28 +144,28 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 	public Integer visitTg(TgContext ctx) {
 		visitChildren(ctx);
 		traceur.tg(getAttValue(ctx.exp()));
-		Log.append("visitTg\n" );
+		Log.appendnl("visitTg");
 		return 0;
 	}
 
 	@Override
 	public Integer visitLc(LcContext ctx) {
 		traceur.lc();
-		Log.append("visitLc\n" );
+		Log.appendnl("visitLc");
 		return 0;
 	}
 
 	@Override
 	public Integer visitBc(BcContext ctx) {
 		traceur.bc();
-		Log.append("visitBc\n" );
+		Log.appendnl("visitBc");
 		return 0;
 	}
 
 	@Override
 	public Integer visitVe(VeContext ctx) {
 		traceur.ve();
-		Log.append("visitVe\n" );
+		Log.appendnl("visitVe");
 		return 0;
 	}
 
