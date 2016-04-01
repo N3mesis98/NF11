@@ -12,15 +12,27 @@ programme : liste_instructions
 liste_instructions :
   (instruction)+   
 ;
+
+exp :
+    exp ('*'|'/') exp # mult
+  | exp ('+'|'-') exp # sum
+  | atom
+;
+
+atom :
+    INT
+  | '('exp')'
+;
+
 instruction :
-    'av' INT # av
-  | 'td' INT # td
-  | 'tg' INT # tg
+    'av' exp # av
+  | 'td' exp # td
+  | 'tg' exp # tg
   | 'lc' # lc
   | 'bc' # bc
   | 've' # ve
-  | 're' INT # re
-  | 'fpos' INT INT # fpos
-  | 'fcc' INT # fcc
+  | 're' exp # re
+  | 'fpos' exp exp # fpos
+  | 'fcc' exp # fcc
 ;  
    
