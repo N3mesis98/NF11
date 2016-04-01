@@ -1,6 +1,10 @@
 .idea/
 *.iml
 .geany
+.classpath
+.project
+.settings/
+
 bin/
 target/
 src/logoparsing/**
