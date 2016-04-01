@@ -13,26 +13,26 @@ liste_instructions :
   (instruction)+   
 ;
 
+instruction :
+    'av' exp # av
+  | 'td' exp # td
+  | 'tg' exp # tg
+  | 'lc' # lc
+  | 'bc' # bc
+  | 've' # ve
+  | 're' exp # re
+  | 'fpos' exp exp # fpos
+  | 'fcc' exp # fcc
+;  
+
 exp :
-    exp ('*'|'/') exp   # mult
-  | exp ('+'|'-') exp   # sum
-  | atom                # arule
+	'hasard' exp # hasard
+  | exp ('*'|'/') exp # mult
+  | exp ('+'|'-') exp # sum
+  | atom # arule
 ;
 
 atom :
-    INT         # int
-  | '('exp')'   # parent
+    INT # int
+  | '('exp')' # parent
 ;
-
-instruction :
-    'av' exp        # av
-  | 'td' exp        # td
-  | 'tg' exp        # tg
-  | 'lc'            # lc
-  | 'bc'            # bc
-  | 've'            # ve
-  | 're' exp        # re
-  | 'fpos' exp exp  # fpos
-  | 'fcc' exp       # fcc
-;  
-   
