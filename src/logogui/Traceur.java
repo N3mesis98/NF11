@@ -19,6 +19,7 @@ public class Traceur {
     private double teta;
     private boolean drawing = true;
     private Color color = Color.BLACK;
+    private Color[] colors = { Color.BLACK, Color.RED, Color.GREEN, Color.YELLOW, Color.BLUE, Color.PURPLE, Color.CYAN, Color.WHITE };
 
 
     private void setTeta() {
@@ -88,32 +89,6 @@ public class Traceur {
     }
 
     public void fcc(int colorId) {
-        colorId %= 8;
-        switch (colorId) {
-        case 1:
-            color = Color.RED;
-            break;
-        case 2:
-            color = Color.GREEN;
-            break;
-        case 3:
-            color = Color.YELLOW;
-            break;
-        case 4:
-            color = Color.BLUE;
-            break;
-        case 5:
-            color = Color.PURPLE;
-            break;
-        case 6:
-            color = Color.CYAN;
-            break;
-        case 7:
-            color = Color.WHITE;
-            break;
-        default:
-            color = Color.BLACK;
-            break;
-        }
+        color = colors[colorId %8];
     }
 }
