@@ -30,18 +30,6 @@ import logoparsing.LogoParser.VeContext;
 import logoparsing.LogoParser.RepeteContext;
 
 public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
-
-    @Override
-    public Integer visitHasard(HasardContext ctx) {
-        visitChildren(ctx);
-
-        int max = getAttValue(ctx.exp());
-        int hvalue = ThreadLocalRandom.current().nextInt(0, max +1);
-        setAttValue(ctx, hvalue);
-        Log.appendnl("visitHasard (value=" + hvalue + ")");
-        return 0;
-    }
-
     Traceur traceur;
     ParseTreeProperty<Integer> atts = new ParseTreeProperty<Integer>();
 
@@ -60,6 +48,17 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 
     public int getAttValue(ParseTree node) {
         return atts.get(node);
+    }
+
+    @Override
+    public Integer visitHasard(HasardContext ctx) {
+        visitChildren(ctx);
+
+        int max = getAttValue(ctx.exp());
+        int hvalue = ThreadLocalRandom.current().nextInt(0, max +1);
+        setAttValue(ctx, hvalue);
+        Log.appendnl("visitHasard (value=" + hvalue + ")");
+        return 0;
     }
 
     @Override

@@ -1,28 +1,11 @@
-av 20
-fcc 1
-td 36
-av 20
-fcc 2
-td 36
-av 20
-fcc 3
-td 36
-av 20
-fcc 4
-td 36
-av 20
-fcc 5
-td 36
-av 20
-fcc 6
-td 36
-av 20
-fcc 7
-td 36
-av 20
-fcc 8
-td 36
-av 20
-fcc 9
-td 36
-av 20
+fpos 400 250
+repete 30
+[
+	td 360 / 30
+	fcc hasard 6
+	repete 4
+	[
+		td 360 / 4
+		av 100
+	]
+]
