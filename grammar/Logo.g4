@@ -35,5 +35,6 @@ exp :
 
 atom :
     INT # int
+    | 'loop' # loop
     | '('exp')' # parent
 ;

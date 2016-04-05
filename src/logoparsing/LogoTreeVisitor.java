@@ -1,5 +1,7 @@
 package logoparsing;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javafx.scene.Group;
@@ -28,10 +30,12 @@ import logoparsing.LogoParser.TdContext;
 import logoparsing.LogoParser.TgContext;
 import logoparsing.LogoParser.VeContext;
 import logoparsing.LogoParser.RepeteContext;
+import logoparsing.LogoParser.LoopContext;
 
 public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     Traceur traceur;
     ParseTreeProperty<Integer> atts = new ParseTreeProperty<Integer>();
+    List<Integer> loopIndex = new ArrayList<Integer>();
 
     public LogoTreeVisitor() {
         super();
@@ -196,10 +200,26 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     public Integer visitRepete(RepeteContext ctx) {
         visit(ctx.exp());
         int n = getAttValue(ctx.exp());
+        int index = loopIndex.size();
+        loopIndex.add(1);
         for (int i=0; i<n; i++) {
             visit(ctx.liste_instructions());
+            loopIndex.set(index, loopIndex.get(index)+1);
         }
+        loopIndex.remove(loopIndex.size()-1);
         Log.appendnl("visitRepete");
         return 0;
+    }
+    
+    @Override
+    public Integer visitLoop(LoopContext ctx) {
+        if (loopIndex.size() > 0) {
+            setAttValue(ctx, loopIndex.get(loopIndex.size()-1));
+            Log.appendnl("visitLoop");
+            return 0;
+        }
+        else {
+            return 1;
+        }
     }
 }
