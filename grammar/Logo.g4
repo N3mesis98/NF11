@@ -5,6 +5,7 @@ grammar Logo;
 }
 
 INT : '0' | [1-9][0-9]* ;
+ID : [_a-zA-Z][_a-zA-Z0-9]* ;
 WS : [ \t\r\n]+ -> skip ;
 
 programme : liste_instructions
@@ -24,17 +25,23 @@ instruction :
     | 'fpos' exp exp # fpos
     | 'fcc' exp # fcc
     | 'repete' exp '['liste_instructions']' # repete
+    | 'si' exp '['liste_instructions']' ('['liste_instructions']')? # si
+    | 'tantque' exp '['liste_instructions']' # tantque
+    | 'donne' '"' ID exp # donne
 ;
 
 exp :
     'hasard' exp # hasard
     | exp ('*'|'/') exp # mult
     | exp ('+'|'-') exp # sum
+    | exp ('=='|'>='|'<='|'>'|'<'|'!=') exp # test
+    | '!' exp # neg
     | atom # arule
 ;
 
 atom :
     INT # int
+    | ':'ID # id
     | 'loop' # loop
     | '('exp')' # parent
 ;

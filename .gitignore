@@ -9,3 +9,4 @@ bin/
 target/
 src/logoparsing/**
 !src/logoparsing/LogoTreeVisitor.java
+!src/logoparsing/SymTable.java
