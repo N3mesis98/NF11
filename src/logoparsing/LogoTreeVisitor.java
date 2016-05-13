@@ -8,10 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -25,9 +22,14 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 
     private SymTable symTable = new SymTable();
     // stack of SymTable
+    private Stack<SymTable> symTableStack = new Stack<>();
 
     public LogoTreeVisitor() {
         super();
+
+        // push a new table of symbols
+        symTableStack.push(new SymTable());
+
     }
 
     public void initialize(Group g) {
@@ -77,6 +79,15 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 
         // check number of params
 
+
+        // push a new symTable on the stack
+
+
+        // execute procedure
+        //visit(toCall.getInstructions());
+
+        // log : " visit " + ctx.ID().getText()
+
         return 0;
     }
 
@@ -99,7 +110,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
             return 1;
         }
 
-        symTable.donne(ctx.ID().getText(), getAttValue(ctx.exp()));
+        symTableStack.peek().donne(ctx.ID().getText(), getAttValue(ctx.exp()));
 
         Log.appendnl("visitDonne : " + ctx.ID().getText() + " <- " + getAttValue(ctx.exp()));
         return 0;
@@ -108,7 +119,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     @Override
     public Integer visitId(IdContext ctx) {
         try {
-            setAttValue(ctx, symTable.valueOf(ctx.ID().getText()));
+            setAttValue(ctx, symTableStack.peek().valueOf(ctx.ID().getText()));
         } catch (RuntimeException re) {
             Log.appendnl(re.toString());
             return 1;
