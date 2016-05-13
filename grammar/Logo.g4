@@ -8,10 +8,20 @@ INT : '0' | [1-9][0-9]* ;
 ID : [_a-zA-Z][_a-zA-Z0-9]* ;
 WS : [ \t\r\n]+ -> skip ;
 
-programme : liste_instructions
+programme :
+    liste_declarations? liste_instructions
 ;
+
+liste_declarations :
+    (declaration)+
+;
+
 liste_instructions :
     (instruction)+
+;
+
+declaration :
+    'pour' ID (':'ID)+ (liste_instructions)+ 'fin' # procedure
 ;
 
 instruction :

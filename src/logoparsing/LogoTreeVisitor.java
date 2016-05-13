@@ -8,13 +8,16 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     private Traceur traceur;
     private ParseTreeProperty<Integer> atts = new ParseTreeProperty<>();
     private List<Integer> loopIndex = new ArrayList<>();
+    private Map<String, Procedure> procedures = new HashMap<>();
 
     private SymTable symTable = new SymTable();
 
@@ -33,6 +36,12 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 
     public int getAttValue(ParseTree node) {
         return atts.get(node);
+    }
+
+    @Override
+    public Integer visitProcedure(ProcedureContext ctx) {
+
+        return 0;
     }
 
     @Override
