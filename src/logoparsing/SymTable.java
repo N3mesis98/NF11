@@ -1,7 +1,5 @@
 package logoparsing;
 
-import sun.util.PreHashedMap;
-
 import java.util.HashMap;
 import java.util.Map;
 
