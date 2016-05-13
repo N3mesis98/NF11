@@ -20,7 +20,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     // we need to keep track of the procedure we are creating, when exploring its parameters node
     private Procedure currentProcedure = null;
 
-    private SymTable symTable = new SymTable();
+    //private SymTable symTable = new SymTable();
     // stack of SymTable
     private Stack<SymTable> symTableStack = new Stack<>();
 
@@ -90,14 +90,21 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
             Log.appendnl("visitProcedureCall ("+procedureName+") : Error : invalid number of argument");
             return 1;
         }
-
-        // push a new symTable on the stack
-
+        
+        // copy current symTable
+        SymTable symTable = new SymTable(symTableStack.peek());
+        // add the parameters
+        for (int i=0; i<parameterValues.size(); i++) {
+            symTable.donne(toCall.getParams().get(i), parameterValues.get(i));
+        }
+         // and push
+        symTableStack.push(symTable);
 
         // execute procedure
-        //visit(toCall.getInstructions());
+        visit(toCall.getInstructions());
         
         // remove symTable from the stack
+        symTableStack.pop();
         
         Log.appendnl("visitProcedureCall ("+procedureName+")");
         return 0;

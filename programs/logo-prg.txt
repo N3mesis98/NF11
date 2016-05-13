@@ -1,8 +1,10 @@
-pour tracecarre :n
-repete 4 [
-av :n td 90
-]
+pour rcarre :c :n
+    repete 4 [
+        av :c td 90
+    ]
+    si :n>1 [
+        rcarre :c*3/4 :n-1
+    ]
 fin
-tracecarre 100
-donne "cote 200
-tracecarre :cote
+
+rcarre 300 10
