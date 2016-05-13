@@ -1,11 +1,8 @@
-fpos 400 250
-repete 30
-[
-	td 360 / 30
-	fcc hasard 6
-	repete 4
-	[
-		td 360 / 4
-		av 100
-	]
+pour tracecarre :n
+repete 4 [
+av :n td 90
 ]
+fin
+tracecarre 100
+donne "cote 200
+tracecarre :cote
