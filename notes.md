@@ -8,10 +8,16 @@ On préférera spécifier dans `Logo.g4` un programme comme étant :
 ## La classe procédure
 | Procédure |
 | --------- |
-| nom: String |
 | params: String[] |
 | instructions: ParseTree |
 
 On garde une référence vers un `ParseTree`, qui est classe mère d'un noeud de Contexte (ici d'une ListeInstructionContext).
 
 Petit refactoring sûrement nécessaire pour l'empilement des variables : à l'appel d'une procédure, empiler la table de ses variables locales...
+On considère donc maintenant *une pile de `SymTable`*.
+
+## La déclaration des procédures
+Elles sont stockées dans une map : clé:nom_procedure, valeur:procedure
+
+## L'appel aux procédures
+On ne peut pas, dans la grammaire, vérifier que le nombre d'arguments passés à l'appel d'une procédure correspond aux nombre d'arguments qu'elle attend.
