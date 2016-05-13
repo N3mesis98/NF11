@@ -92,7 +92,9 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
         }
         
         // copy current symTable
-        SymTable symTable = new SymTable(symTableStack.peek());
+        //SymTable symTable = new SymTable(symTableStack.peek());
+        
+        SymTable symTable = new SymTable();
         // add the parameters
         for (int i=0; i<parameterValues.size(); i++) {
             symTable.donne(toCall.getParams().get(i), parameterValues.get(i));
