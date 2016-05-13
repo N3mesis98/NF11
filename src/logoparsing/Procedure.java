@@ -11,9 +11,7 @@ public class Procedure {
     private List<String> params;
     private ParseTree instructions;
 
-    public Procedure() {
-
-    }
+    public Procedure() {}
 
     public Procedure(Procedure p) {
         this.params = p.params;

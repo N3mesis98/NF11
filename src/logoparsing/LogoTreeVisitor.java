@@ -29,7 +29,6 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
 
         // push a new table of symbols
         symTableStack.push(new SymTable());
-
     }
 
     public void initialize(Group g) {
@@ -58,6 +57,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
         procedures.put(name, new Procedure(currentProcedure));
 
         currentProcedure = null; // reset
+        Log.appendnl("visitDeclaration ("+name+")");
         return 0;
     }
 
@@ -73,21 +73,33 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     @Override
     public Integer visitProcedureCall(ProcedureCallContext ctx) {
         // get the procedure
-        Procedure toCall = procedures.get(ctx.ID().getText());
+        String procedureName = ctx.ID().getText();
+        Procedure toCall = procedures.get(procedureName);
         if (toCall == null)
             return 1;
 
         // check number of params
-
+        List<Integer> parameterValues = new ArrayList<>();
+        for (ExpContext expCtx : ctx.exp()) {
+            if (visit(expCtx) != 0) {
+                return 1;
+            }
+            parameterValues.add(getAttValue(expCtx));
+        }
+        if (parameterValues.size() != toCall.getParams().size()) {
+            Log.appendnl("visitProcedureCall ("+procedureName+") : Error : invalid number of argument");
+            return 1;
+        }
 
         // push a new symTable on the stack
 
 
         // execute procedure
         //visit(toCall.getInstructions());
-
-        // log : " visit " + ctx.ID().getText()
-
+        
+        // remove symTable from the stack
+        
+        Log.appendnl("visitProcedureCall ("+procedureName+")");
         return 0;
     }
 
