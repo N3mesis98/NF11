@@ -6,20 +6,25 @@ import logogui.Traceur;
 import logoparsing.LogoParser.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     private Traceur traceur;
     private ParseTreeProperty<Integer> atts = new ParseTreeProperty<>();
     private List<Integer> loopIndex = new ArrayList<>();
     private Map<String, Procedure> procedures = new HashMap<>();
+    // we need to keep track of the procedure we are creating, when exploring its parameters node
+    private Procedure currentProcedure = null;
 
     private SymTable symTable = new SymTable();
+    // stack of SymTable
 
     public LogoTreeVisitor() {
         super();
@@ -39,7 +44,38 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     }
 
     @Override
-    public Integer visitProcedure(ProcedureContext ctx) {
+    public Integer visitDeclaration(DeclarationContext ctx) {
+        String name = ctx.ID().getText();
+        ParseTree instr = ctx.liste_instructions();
+
+        currentProcedure = new Procedure();
+        currentProcedure.setInstructions(instr);
+
+        visit(ctx.liste_params());
+
+        procedures.put(name, new Procedure(currentProcedure));
+
+        currentProcedure = null; // reset
+        return 0;
+    }
+
+    @Override
+    public Integer visitListe_params(Liste_paramsContext ctx) {
+        List<String> params = ctx.ID().stream().map(TerminalNode::getText).collect(Collectors.toList());
+
+        currentProcedure.setParams(params);
+
+        return 0;
+    }
+
+    @Override
+    public Integer visitProcedureCall(ProcedureCallContext ctx) {
+        // get the procedure
+        Procedure toCall = procedures.get(ctx.ID().getText());
+        if (toCall == null)
+            return 1;
+
+        // check number of params
 
         return 0;
     }

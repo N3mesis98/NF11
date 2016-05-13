@@ -21,11 +21,16 @@ liste_instructions :
 ;
 
 declaration :
-    'pour' ID (':'ID)+ (liste_instructions)+ 'fin' # procedure
+    'pour' ID liste_params? liste_instructions 'fin'
+;
+
+liste_params :
+    (':'ID)+
 ;
 
 instruction :
-    'av' exp # av
+    ID (exp)* # procedureCall
+    | 'av' exp # av
     | 'td' exp # td
     | 'tg' exp # tg
     | 'lc' # lc
