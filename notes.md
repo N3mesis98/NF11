@@ -1,27 +1,17 @@
-# NF11 - TP3
+# NF11 - TP5
 
-## TODO-list
-- `exp` et nouveau parcours d'arbre
-    + Done
-- fonction hasard
-    + Done
-- fonction repete
-    + Done
-- variable loop
-- ajouter logs
-- rendu Moodle (en fait, non, c'est pas à faire)
+*Attention*, `pour` n'est pas à considérer comme une instruction. Sinon, on pourrait déclarer une procédure en cours d'éxecution, dans un `répéte`ou bien même encore dans une autre `procédure`... à proscrire.
+On préférera spécifier dans `Logo.g4` un programme comme étant :
+1. Une liste optionnelle de déclarations
+2. Une liste d'instructions
 
-## Prise de notes
-- On intègre maintenant les expressions arithmétiques.
-- Il ne s'agit plus simplement de visiter des noeuds INT, mais bien des noeuds expr
+## La classe procédure
+| Procédure |
+| --------- |
+| nom: String |
+| params: String[] |
+| instructions: ParseTree |
 
-Pour ce faire, on utilise toujours le système de parcours d'arbre avec `visitChildren(ctx)` pour visiter tous les noeuds fils sans distinction, et `visit(ctx.exp())` pour filtrer les noeuds à visiter (ici, les noeuds `exp()`).
-De la même manière, chaque noeud peut accéder à la map nommée `atts` pour y stocker une valeur ou rechercher une valeur attachée à un noeud en particulier.
+On garde une référence vers un `ParseTree`, qui est classe mère d'un noeud de Contexte (ici d'une ListeInstructionContext).
 
-## Rendu Moodle
-Question :
->Comment sont interprétés : av hasard 200 + 100 et av 200 + hasard 100 ?
->Pourquoi ?
-
-Cela dépend de la manière dont on a placé la fonction `hasard` dans l'ordre de priorité des opérations arithmétiques de `exp`.
-Pour l'instant : hasard est prioritaire (voir l'arbre généré, tout simplement)
+Petit refactoring sûrement nécessaire pour l'empilement des variables : à l'appel d'une procédure, empiler la table de ses variables locales...
