@@ -17,10 +17,9 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     private ParseTreeProperty<Integer> atts = new ParseTreeProperty<>();
     private List<Integer> loopIndex = new ArrayList<>();
     private Map<String, Procedure> procedures = new HashMap<>();
+    private Map<String, Function> functions = new HashMap<>();
     // we need to keep track of the procedure we are creating, when exploring its parameters node
     private Procedure currentProcedure = null;
-
-    //private SymTable symTable = new SymTable();
     // stack of SymTable
     private Stack<SymTable> symTableStack = new Stack<>();
 
@@ -45,7 +44,7 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     }
 
     @Override
-    public Integer visitDeclaration(DeclarationContext ctx) {
+    public Integer visitDeclarationProcedure(DeclarationProcedureContext ctx) {
         String name = ctx.ID().getText();
         ParseTree instr = ctx.liste_instructions();
 
@@ -57,7 +56,29 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
         procedures.put(name, new Procedure(currentProcedure));
 
         currentProcedure = null; // reset
-        Log.appendnl("visitDeclaration ("+name+")");
+        Log.appendnl("visitDeclarationProcedure ("+name+")");
+        return 0;
+    }
+    
+    @Override
+    public Integer visitDeclarationFunction(DeclarationFunctionContext ctx) {
+        String name = ctx.ID().getText();
+        currentProcedure = new Procedure();
+        
+        // retrieve instructions
+        ParseTree instr = ctx.liste_instructions();
+        currentProcedure.setInstructions(instr);
+        
+        // set the parameters
+        visit(ctx.liste_params());
+        
+        // retrieve the return expression
+        ExpContext returnExp = ctx.exp();
+
+        functions.put(name, new Function(currentProcedure, returnExp));
+
+        currentProcedure = null; // reset
+        Log.appendnl("visitDeclarationFunction ("+name+")");
         return 0;
     }
 
@@ -109,6 +130,58 @@ public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
         symTableStack.pop();
         
         Log.appendnl("visitProcedureCall ("+procedureName+")");
+        return 0;
+    }
+    
+    @Override
+    public Integer visitFunctionCall(FunctionCallContext ctx) {
+        // get the function
+        String functionName = ctx.ID().getText();
+        Function toCall = functions.get(functionName);
+        if (toCall == null)
+            return 1;
+
+        // check number of params
+        List<Integer> parameterValues = new ArrayList<>();
+        for (ExpContext expCtx : ctx.exp()) {
+            if (visit(expCtx) != 0) {
+                return 1;
+            }
+            parameterValues.add(getAttValue(expCtx));
+        }
+        if (parameterValues.size() != toCall.getParams().size()) {
+            Log.appendnl("visitFunctionCall ("+functionName+") : Error : invalid number of argument");
+            return 1;
+        }
+        
+        // copy current symTable
+        //SymTable symTable = new SymTable(symTableStack.peek());
+        
+        SymTable symTable = new SymTable();
+        // add the parameters
+        for (int i=0; i<parameterValues.size(); i++) {
+            symTable.donne(toCall.getParams().get(i), parameterValues.get(i));
+        }
+         // and push
+        symTableStack.push(symTable);
+
+        // execute instructions if some exists
+        ParseTree instructions = toCall.getInstructions();
+        if (instructions != null) {
+            visit(instructions);
+        }
+        
+        // set the return value
+        ExpContext expCtx = toCall.getReturnExp();
+        if (visit(expCtx) != 0) {
+            return 1;
+        }
+        setAttValue(ctx, getAttValue(expCtx));
+        
+        // remove symTable from the stack
+        symTableStack.pop();
+        
+        Log.appendnl("visitFunctionCall ("+functionName+")");
         return 0;
     }
 

@@ -9,19 +9,29 @@ ID : [_a-zA-Z][_a-zA-Z0-9]* ;
 WS : [ \t\r\n]+ -> skip ;
 
 programme :
-    liste_declarations? liste_instructions
+    liste_declarations?
+    liste_instructions?
 ;
 
 liste_declarations :
-    (declaration)+
+    (declarationProcedure|declarationFunction)+
 ;
 
 liste_instructions :
     (instruction)+
 ;
 
-declaration :
-    'pour' ID liste_params? liste_instructions 'fin'
+declarationProcedure :
+    'pour' ID '(' liste_params? ')'
+        liste_instructions
+    'fin'
+;
+
+declarationFunction :
+    'pour' ID '(' liste_params? ')'
+        liste_instructions?
+        'rends' exp
+    'fin'
 ;
 
 liste_params :
@@ -29,7 +39,7 @@ liste_params :
 ;
 
 instruction :
-    ID (exp)* # procedureCall
+    ID '(' (exp)* ')' # procedureCall
     | 'av' exp # av
     | 'td' exp # td
     | 'tg' exp # tg
@@ -46,7 +56,8 @@ instruction :
 ;
 
 exp :
-    'hasard' exp # hasard
+    ID '(' (exp)* ')' # functionCall
+    | 'hasard' exp # hasard
     | exp ('*'|'/') exp # mult
     | exp ('+'|'-') exp # sum
     | exp ('=='|'>='|'<='|'>'|'<'|'!=') exp # test

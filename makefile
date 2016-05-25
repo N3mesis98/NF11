@@ -8,7 +8,7 @@ SRC=$(shell for file in `find src -name "*.java"`; do echo $$file; done)
 OBJ=$(shell for file in `find src -name "*.java"`; do echo $$file | sed -e 's/^src/bin/' -e 's/\.java$$/\.class/'; done)
 XML=$(shell for file in `find src -name "*.fxml"`; do echo $$file | sed -e 's/^src/bin/'; done)
 
-all: bin gen $(XML) $(OBJ)
+all: bin gen $(OBJ) $(XML)
 
 bin:
 	mkdir bin

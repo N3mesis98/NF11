@@ -11,3 +11,4 @@ src/logoparsing/**
 !src/logoparsing/LogoTreeVisitor.java
 !src/logoparsing/SymTable.java
 !src/logoparsing/Procedure.java
+!src/logoparsing/Function.java
