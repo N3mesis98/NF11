@@ -6,8 +6,6 @@ import logoparsing.LogoParser.*;
 import java.util.List;
 
 public class Function extends Procedure {
-    private List<String> params;
-    private ParseTree instructions;
     private ExpContext returnExp;
 
     public Function() {}
