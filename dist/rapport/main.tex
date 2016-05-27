@@ -109,5 +109,150 @@ atom :
 ;
 \end{lstlisting}
 
+\section{Structures de données}
+\subsection{Classes}
+On commence par définir une classe pour la table des symboles.
+Elle permet de sauvegarder les valeurs associées aux variables déclarées et de retrouver ces valeurs.
+\begin{lstlisting}[language=Java]
+public class SymTable {
+    private Map<String, Integer> symTable;
+    
+    public SymTable() {
+        symTable = new HashMap<>();
+    }
+    
+    public SymTable(SymTable s) {
+        symTable = new HashMap<>(s.getSymTableMap());
+    }
+    
+    public Map<String, Integer> getSymTableMap() {
+        return symTable;
+    }
+
+    public void donne(String s, int n) {
+        symTable.put(s, n);
+    }
+
+    public int valueOf(String s) throws RuntimeException {
+        Integer res = symTable.get(s);
+        if (res == null)
+            throw new RuntimeException("variable '"+s+"' non définie");
+        else
+            return res;
+    }
+}
+\end{lstlisting}
+
+La classe \lstinline$Procedure$ a pour but de sauvegarder les instructions et les paramètres nécessaires à l’exécution d'une procédure déclarée au début du programme Logo.
+\begin{lstlisting}[language=Java]
+public class Procedure {
+    private List<String> params;
+    private ParseTree instructions;
+
+    public Procedure() {}
+
+    public Procedure(Procedure p) {
+        this.params = p.params;
+        this.instructions = p.instructions;
+    }
+
+    public List<String> getParams() {
+        return params;
+    }
+
+    public void setParams(List<String> params) {
+        this.params = params;
+    }
+
+    public ParseTree getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(ParseTree instructions) {
+        this.instructions = instructions;
+    }
+}
+\end{lstlisting}
+
+La classe \lstinline$Function$ hérite de la précédente, mais nécessite en plus de sauvegarder l'expression de retour.
+\begin{lstlisting}[language=Java]
+public class Function extends Procedure {
+    private ExpContext returnExp;
+
+    public Function() {}
+
+    public Function(Procedure p, ExpContext returnExp) {
+        super(p);
+        this.returnExp = returnExp;
+    }
+
+    public ExpContext getReturnExp() {
+        return returnExp;
+    }
+
+    public void setReturnExp(ExpContext returnExp) {
+        this.returnExp = returnExp;
+    }
+}
+\end{lstlisting}
+
+\subsection{Structures du visiteur d'arbre}
+En utilisant notamment les classes définies précédemment, on créé dans le visiteur d'arbre les structures suivantes :
+\begin{itemize}
+	\item \lstinline$atts$ : Une structure associant à certains nœuds de l'arbre une valeur entière. On peut ainsi récupérer la valeur de retour d'un nœud fils après l'avoir visité.
+	\item \lstinline$loopIndex$ : Une pile permettant de stocker la valeur des différents compteur de boucles.
+	\item \lstinline$procedures$ : Un dictionnaire associant à un nom de procédure, l'objet procédure correspondant.
+	\item \lstinline$functions$ : Un dictionnaire similaire pour les fonctions.
+	\item \lstinline$symTableStack$ : Une pile contenant les table de symboles des différents appels de procédures et de fonction.
+\end{itemize}
+\begin{lstlisting}[language=Java]
+private ParseTreeProperty<Integer> atts = new ParseTreeProperty<>();
+private Stack<Integer> loopIndex = new Stack<>();
+private Map<String, Procedure> procedures = new HashMap<>();
+private Map<String, Function> functions = new HashMap<>();
+private Stack<SymTable> symTableStack = new Stack<>();
+\end{lstlisting}
+
+\section{Fonctionnement du visiteur d'arbre}
+\subsection{L'instruction repete et la variable loop}
+En logo, l'instruction \lstinline$repete$ permet d’exécuter un nombre donné de fois une série d'instruction.
+La variable \lstinline$loop$ permet, elle, de récupérer le numéro d'itération de la boucle \lstinline$repete$ de plus bas niveau.
+
+Techniquement parlant, au début de l'analyse d'une instruction \lstinline$repete$, on ajoute à la pile \lstinline$loopIndex$ une nouvelle entrée initialisée à 1.
+À chaque itération, on visite tous les nœuds fils de type instruction et on incrémente la valeur de haut de pile.
+Si une des instructions visitée contient une expression incluant la variable \lstinline$loop$, on lui substitue la valeur en haut de \lstinline$loopIndex$.
+Une fois l'instruction répète terminée, on dépile le compteur ajouté.
+
+\begin{lstlisting}[language=Java]
+public Integer visitRepete(RepeteContext ctx) {
+    if (visit(ctx.exp()) != 0) {
+        return 1;
+    }
+    int n = getAttValue(ctx.exp());
+    int index = loopIndex.size();
+    loopIndex.add(1);
+    for (int i = 0; i < n; i++) {
+        if (visit(ctx.liste_instructions()) != 0) {
+            return 1;
+        }
+        loopIndex.set(index, loopIndex.get(index) + 1);
+    }
+    loopIndex.remove(loopIndex.size() - 1);
+    Log.appendnl("visitRepete");
+    return 0;
+}
+    
+public Integer visitLoop(LoopContext ctx) {
+    if (loopIndex.size() > 0) {
+        setAttValue(ctx, loopIndex.get(loopIndex.size() - 1));
+        Log.appendnl("visitLoop");
+        return 0;
+    } else {
+        return 1;
+    }
+}
+\end{lstlisting}
+
+\subsection{Gestion des procédures et des fonctions}
 
 \end{document}
