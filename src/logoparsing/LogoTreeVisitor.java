@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class LogoTreeVisitor extends LogoBaseVisitor<Integer> {
     private Traceur traceur;
     private ParseTreeProperty<Integer> atts = new ParseTreeProperty<>();
-    private List<Integer> loopIndex = new ArrayList<>();
+    private Stack<Integer> loopIndex = new Stack<>();
     private Map<String, Procedure> procedures = new HashMap<>();
     private Map<String, Function> functions = new HashMap<>();
     // we need to keep track of the procedure we are creating, when exploring its parameters node
