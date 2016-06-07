@@ -1,14 +1,19 @@
-pour trois_quart (:n)
-    rends :n*3/4
+pour trois_quart (:x :n)
+    donne "t 3
+    si :n > 1 [
+        donne "x trois_quart(:x :n-1)
+    ]
+    rends :x*:t/4
 fin
 
 pour rcarre (:c :n)
     repete 4 [
-        av :c td 90
+        av trois_quart(:c :n)
+        td 90
     ]
     si :n>1 [
-        rcarre (trois_quart(:c) :n-1)
+        rcarre(:c :n-1)
     ]
 fin
 
-rcarre (300 10)
+rcarre(300 10)
