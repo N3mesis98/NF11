@@ -254,9 +254,13 @@ public Integer visitLoop(LoopContext ctx) {
 \end{lstlisting}
 
 \subsection{Gestion des procédures et des fonctions}
+\subsubsection{Introduction}
 Comme nous l'avons expliqué dans la section Grammaire, un programme logo peut se décomposer en deux parties distinctes ; la première est les déclarations des fonctions et procédures, la seconde est la liste des instructions d'exécution (certaines pouvant être des appels à des fonctions).
 
+\subsubsection{Déclarations de procédures et fonctions}
 Les méthodes du visiteur d'arbre renvoyant des entiers, il est nécessaire de garder une référence sur la procédure en construction, afin de pouvoir lui affecter paramètres et instructions \textit{pendant} la visite même de sa déclaration. Le visiteur d'arbre possède un attribut \lstinline$Procedure currentProcedure$, qui permet cela.
+
+La déclaration et l'utilisation des paramètres d'une procédure requiert l'utilisation de parenthèses. En effet, étant donné que nous pouvons passer en argument le résultat de l'évalutation d'une fonction, il devient difficile de délimiter quels arguments appartiennent à quelle fonction, et le nombre d'arguments d'une fonction. L'utilisation de parenthèses est donc introduite dans notre grammaire, et n'est pas optionnelle.
 
 La visite d'un noeud de déclaration de procédure ou de fonction permet la création d'objets \lstinline$Procedure$ et \lstinline$Function$, et leur enregistrement dans les \lstinline$HashMap$ du visiteur d'arbre. La clé du couple Clé Valeur stocké dans ces maps est l'identifiant contenu dans le noeud ID suivant le terme 'pour'.
 
@@ -292,6 +296,7 @@ public Integer visitListe_params(Liste_paramsContext ctx) {
 
 La visite d'une déclaration de fonction est identique à la visite d'une déclaration de procédure (une fonction est une procédure), si ce n'est qu'on crée un objet \lstinline$Function$, que l'on ajoute à la map \lstinline$functions$.
 
+\subsubsection{Appels de procédures et fonctions}
 
 %parenthèses
 %empilement des tables de symboles ( = scopes, on se cantonne au scope local ici)
