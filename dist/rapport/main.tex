@@ -254,5 +254,48 @@ public Integer visitLoop(LoopContext ctx) {
 \end{lstlisting}
 
 \subsection{Gestion des procédures et des fonctions}
+Comme nous l'avons expliqué dans la section Grammaire, un programme logo peut se décomposer en deux parties distinctes ; la première est les déclarations des fonctions et procédures, la seconde est la liste des instructions d'exécution (certaines pouvant être des appels à des fonctions).
+
+Les méthodes du visiteur d'arbre renvoyant des entiers, il est nécessaire de garder une référence sur la procédure en construction, afin de pouvoir lui affecter paramètres et instructions \textit{pendant} la visite même de sa déclaration. Le visiteur d'arbre possède un attribut \lstinline$Procedure currentProcedure$, qui permet cela.
+
+La visite d'un noeud de déclaration de procédure ou de fonction permet la création d'objets \lstinline$Procedure$ et \lstinline$Function$, et leur enregistrement dans les \lstinline$HashMap$ du visiteur d'arbre. La clé du couple Clé Valeur stocké dans ces maps est l'identifiant contenu dans le noeud ID suivant le terme 'pour'.
+
+\begin{lstlisting}[language=Java]
+@Override
+public Integer visitDeclarationProcedure(DeclarationProcedureContext ctx) {
+    String name = ctx.ID().getText();
+    ParseTree instr = ctx.liste_instructions();
+
+    currentProcedure = new Procedure();
+    currentProcedure.setInstructions(instr);
+
+    visit(ctx.liste_params());
+
+    procedures.put(name, new Procedure(currentProcedure));
+
+    currentProcedure = null; // reset
+    Log.appendnl("visitDeclarationProcedure ("+name+")");
+    return 0;
+}
+\end{lstlisting}
+
+Les déclarations contiennent deux jeux de données clés: les paramètres, et les instructions. Les paramètres sont une liste d'identifiants, stockées dans une liste de chaînes de caractères, que l'on collecte en visitant le noeud \lstinline$liste_params$. La liste des instructions est un nœud que nous ne visitons pas (cela provoquerait l'exécution des instructions, ce que nous ne voulons qu'à l'appel de la procédure), mais dont nous gardons une référence, dans l'attribut \lstinline$ParseTree instructions$ de la classe \lstinline$Procedure$.
+
+\begin{lstlisting}[language=Java]
+@Override
+public Integer visitListe_params(Liste_paramsContext ctx) {
+    List<String> params = ctx.ID().stream().map(TerminalNode::getText).collect(Collectors.toList());
+    currentProcedure.setParams(params);
+    return 0;
+}
+\end{lstlisting}
+
+La visite d'une déclaration de fonction est identique à la visite d'une déclaration de procédure (une fonction est une procédure), si ce n'est qu'on crée un objet \lstinline$Function$, que l'on ajoute à la map \lstinline$functions$.
+
+
+%parenthèses
+%empilement des tables de symboles ( = scopes, on se cantonne au scope local ici)
+%fonction est une procédure
+%position du rends forcée
 
 \end{document}
