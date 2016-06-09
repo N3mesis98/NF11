@@ -6,6 +6,12 @@
 .settings/
 *~
 
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.toc
+
 bin/
 target/
 src/logoparsing/**
