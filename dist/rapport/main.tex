@@ -294,13 +294,84 @@ public Integer visitListe_params(Liste_paramsContext ctx) {
 }
 \end{lstlisting}
 
-La visite d'une déclaration de fonction est identique à la visite d'une déclaration de procédure (une fonction est une procédure), si ce n'est qu'on crée un objet \lstinline$Function$, que l'on ajoute à la map \lstinline$functions$.
+La visite d'une déclaration de fonction est identique à la visite d'une déclaration de procédure (une fonction est une procédure), si ce n'est qu'on crée un objet \lstinline$Function$, que l'on ajoute à la map \lstinline$functions$. Également, la valeur de retour d'une fonction est un nœud de type Expression. De la même manière que la liste d'instructions, il n'est pas visité, mais une référence est stockée. Elle sera évaluée à la fin de l'exécution de la fonction.
 
 \subsubsection{Appels de procédures et fonctions}
+L'appel d'une procédure est une \lstinline$instruction$ de la grammaire. Une fonction, elle, retourne une valeur. Son appel est donc reconnu comme étant une expression (\lstinline$exp$) de la grammaire. Cependant, ces deux objets étant semblables, la visite de l'appel se déroule de la même manière. Le déroulement est donc détaillé pour l'appel d'une \lstinline$Procedure$ (remplacer par l'objet \lstinline$Function$, et la map \lstinline$functions$ pour obtenir l'équivalent). Notons tout de même une différence pour la fonction, avec la gestion de la valeur de retour, qui sera expliqué en supplément.
 
-%parenthèses
+Nous nous trouvons dans un état de visite ayant pour contexte \lstinline$ProcedureCallContext$.
+
+Premièrement, la visite du noeud \lstinline$ID$ nous permet d'accéder au nom de la procédure appelée. La correspondance avec les clés de la map \lstinline$procedures$ du visiteur permet de vérifier l'existence de la procédure que nous voulons exécuter, et, le cas échéant, d'en obtenir une référence. 
+
+\begin{lstlisting}
+@Override
+public Integer visitProcedureCall(ProcedureCallContext ctx) {
+    // get the procedure
+    String procedureName = ctx.ID().getText();
+    Procedure toCall = procedures.get(procedureName);
+    if (toCall == null)
+        return 1;
+\end{lstlisting}
+
+Deuxièmement, la liste des expressions constituants les arguments passés à la procédure est visitée, et les expressions sont évaluées si besoin. Si le nombre d'arguments passés est différent du nombre de paramètres attendu, la méthode est interrompue et retourne une erreur. 
+
+\begin{lstlisting}
+    // check number of params
+    List<Integer> parameterValues = new ArrayList<>();
+    for (ExpContext expCtx : ctx.exp()) {
+        if (visit(expCtx) != 0) {
+            return 1;
+        }
+        parameterValues.add(getAttValue(expCtx));
+    }
+    if (parameterValues.size() != toCall.getParams().size()) {
+        Log.appendnl("visitProcedureCall ("+procedureName+") : Error : invalid number of argument");
+        return 1;
+    }
+\end{lstlisting}
+
+Afin de limiter l'accès de la procédure à ses paramètres et variables locales, une nouvelle table de symboles est pushée sur la pile de tables de symboles. Cela implémente le concept de \textit{scope} et d'accessibilité des symboles ; le \textit{scope} global étant la table de symboles se situant au plus profond de la pile. On utilise la méthode donne (utilisée pour la création de variables) afin d'attribuer les valeurs d'arguments aux noms des paramètres, et on place les variables ainsi créées dans la table de symboles.
+
+\begin{lstlisting}
+    SymTable symTable = new SymTable();
+    // add the parameters
+    for (int i=0; i<parameterValues.size(); i++) {
+        symTable.donne(toCall.getParams().get(i), parameterValues.get(i));
+    }
+    // and push
+    symTableStack.push(symTable);
+\end{lstlisting}
+
+On visite le nœud d'instructions de la procédure, ce qui déclenche leur exécution.
+
+\begin{lstlisting}
+    // execute procedure
+    visit(toCall.getInstructions());
+\end{lstlisting}
+
+Dans le cas d'une fonction, nous devons visiter le nœud Expression stocké dans le paramètre \lstinline$ExpContext returnExp$ afin d'évaluer la valeur de retour. Nous plaçons ensuite cette valeur dans la table \lstinline$atts$ , avec pour clé le contexte de la fonction.
+
+\begin{lstlisting}
+    // set the return value
+    ExpContext expCtx = toCall.getReturnExp();
+    if (visit(expCtx) != 0) {
+        return 1;
+    }
+    setAttValue(ctx, getAttValue(expCtx));
+\end{lstlisting}
+
+Enfin, la table des symboles est retirée de la pile, car nous quittons le bloc d'exécution.
+
+\begin{lstlisting}
+    // remove symTable from the stack
+    symTableStack.pop();
+    
+    Log.appendnl("visitProcedureCall ("+procedureName+")");
+    return 0;
+}
+\end{lstlisting}
+
 %empilement des tables de symboles ( = scopes, on se cantonne au scope local ici)
-%fonction est une procédure
 %position du rends forcée
 
 \end{document}
